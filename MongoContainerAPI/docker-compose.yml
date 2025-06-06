@@ -1,0 +1,24 @@
+volumes:
+  mongo_data:
+
+services:
+
+  mongo:
+    image: mongo:6.0
+    restart: always
+    container_name: mongodb
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INIT_DATABASE: MyAppDb
+    ports:
+      - 27017:27017
+
+  api:
+    image: mentoringkc/applialacon:latest
+    restart: always
+    container_name: api_alacon
+    depends_on:
+      - mongo
+    ports:
+      - 8080:8080
