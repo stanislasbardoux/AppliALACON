@@ -36,5 +36,5 @@ jobs:
       run: |
         echo $PRIVATE_KEY > key.pem
         chmod 400 key.pem
-        ssh -i key.pem ${{ vars.EC2_USER }}@${{ vars.EC2_HOSTNAME }} "cd /opt/alacon && docker compose down && docker compose pull && docker compose up -d"
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ vars.EC2_USER }}@${{ vars.EC2_HOSTNAME }} "cd /opt/alacon && docker compose down && docker compose pull && docker compose up -d"
     
