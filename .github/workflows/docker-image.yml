@@ -27,11 +27,14 @@ jobs:
   deploy:
   
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
     - name: Connect to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
       run: |
-        echo ${{ secrets.EC2_PEM_KEY }} > key.pem
+        echo $PRIVATE_KEY > key.pem
         chmod 400 key.pem
         ssh -i key.pem ${{ vars.EC2_USER }}@${{ vars.EC2_HOSTNAME }} "cd /opt/alacon && docker compose down && docker compose pull && docker compose up -d"
     
