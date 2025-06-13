@@ -6,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // bind configuration (not strictly required for simple config reads)
 builder.Configuration
-       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+       .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+       .AddEnvironmentVariables();
 
 // register Swagger
 builder.Services.AddEndpointsApiExplorer();
