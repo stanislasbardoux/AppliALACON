@@ -1,6 +1,7 @@
 using MongoDB.Driver;
 using MongoContainerAPI.Services;
 using MongoContainerAPI;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,23 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IMongoClient>(sp =>
     new MongoClient(builder.Configuration["MongoDB:ConnectionString"]));
 builder.Services.AddSingleton<IDB, MongoDBStore>();
+
+// config Kestrel in prod
+if (builder.Environment.IsProduction())
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        var certPath = builder.Configuration["Kestrel__Certificates__Default__Path"];
+        var certPassword = builder.Configuration["Kestrel__Certificates__Default__Password"];
+        if (!string.IsNullOrEmpty(certPath) && !string.IsNullOrEmpty(certPassword))
+        {
+            options.ConfigureHttpsDefaults(httpsOptions =>
+            {
+                httpsOptions.ServerCertificate = new X509Certificate2(certPath, certPassword);
+            });
+        }
+    });
+}
 
 var app = builder.Build();
 

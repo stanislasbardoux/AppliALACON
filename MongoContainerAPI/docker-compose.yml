@@ -24,3 +24,5 @@ services:
       - 8080:8080
     env_file:
       - .env
+    volumes:
+      - /certs/ec2-alacon.duckdns.org.pfx:/certs/ec2-alacon.duckdns.org.pfx
