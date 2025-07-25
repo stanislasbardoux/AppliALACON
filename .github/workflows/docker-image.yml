@@ -30,11 +30,21 @@ jobs:
     needs: build
 
     steps:
+    - name: Create SSH key
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_PRIVATE_KEY" > ../private.key
+        sudo chmod 600 ../private.key
+        echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      shell: bash
+      env:
+        SSH_PRIVATE_KEY: ${{secrets.EC2_PEM_KEY}}
+        SSH_KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
+        SSH_KEY_PATH: ${{ github.workspace }}/../private.key
     - name: Connect to EC2
       env:
         PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
+        SSH_KEY_PATH: ${{ github.workspace }}/../private.key
       run: |
-        echo $PRIVATE_KEY | tr -d '\r' > key.pem
-        chmod 400 key.pem
-        ssh -o StrictHostKeyChecking=no -i key.pem ${{ vars.EC2_USER }}@${{ vars.EC2_HOSTNAME }} "cd /opt/alacon && docker compose down && docker compose pull && docker compose up -d"
+        ssh -o StrictHostKeyChecking=no -i $SSH_KEY_PATH ${{ vars.EC2_USER }}@${{ vars.EC2_HOSTNAME }} "cd /opt/alacon && docker compose down && docker compose pull && docker compose up -d"
     
